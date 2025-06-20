@@ -1,6 +1,4 @@
-1- 📦 2. Dockerfile для Next.js
-
-# Dockerfile
+# 📦 1- Dockerfile 2. Dockerfile для Next.js
 
 FROM node:18-alpine
 
@@ -16,10 +14,9 @@ RUN npm run build
 EXPOSE 3000
 CMD ["npm", "run", "start"]
 
-⚙️ 3. Nginx конфиг
-Создай папку nginx и файл default.conf внутри:
+# ⚙️3. Nginx конфиг Создай папку nginx и файл default.conf внутри:
 
-# nginx/default.conf
+nginx/default.conf
 
 server {
 listen 80;
@@ -39,9 +36,7 @@ server_name your-domain.com www.your-domain.com;
 
 }
 
-🐳 4. Docker Compose
-
-# Создай docker-compose.yml:
+# 🐳4 Docker Compose Создай docker-compose.yml:
 
 version: '3.8'
 
@@ -64,10 +59,12 @@ image: certbot/certbot
 container_name: certbot
 volumes: - ./certbot/conf:/etc/letsencrypt - ./certbot/www:/var/www/certbot
 
-🛠️ # Шаг 7: Поднять проект (первый запуск — без HTTPS)
+# Шаг 7: Поднять проект (первый запуск — без HTTPS)
+
 docker compose up -d --build
 
-🔐 Шаг 8: Получить SSL-сертификаты
+# 🔐 Шаг 8: Получить SSL-сертификаты
+
 Выполни на сервере:
 docker-compose run --rm certbot certonly \
  --webroot \
@@ -76,7 +73,9 @@ docker-compose run --rm certbot certonly \
  --email your-email@example.com \
  --agree-tos \
  --no-eff-email
-✏️ Шаг 9: Обновить nginx/default.conf для HTTPS
+
+# ✏️ Шаг 9: Обновить nginx/default.conf для HTTPS
+
 server {
 listen 80;
 server_name your-domain.com www.your-domain.com;
@@ -101,17 +100,10 @@ server_name your-domain.com www.your-domain.com;
 Перезапусти nginx:
 docker compose restart nginx
 
-🔁 Шаг 10: Настроить автоматическое обновление сертификатов
+# 🔁 Шаг 10: Настроить автоматическое обновление сертификатов
 
-Добавь cron-задачу:
+# Добавь cron-задачу:
+
 crontab -e
 И вставь:
 0 0 \* \* \* docker compose run --rm certbot renew --webroot --webroot-path=/var/www/certbot && docker compose exec nginx nginx -s reload
-
-docker-compose run --rm certbot certonly \
- --webroot \
- --webroot-path=/var/www/certbot \
- -d cvirko-vadim.ru -d www.cvirko-vadim.ru \
- --email cvi-vadim@yandex.ru \
- --agree-tos \
- --no-eff-email
